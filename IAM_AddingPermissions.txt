@@ -1,0 +1,71 @@
+Change the Zone: using user 1 
+-----------------------------
+
+gcloud --version
+gcloud auth login
+
+gcloud config set compute/region us-east1
+gcloud config set compute/zone us-east1-b
+
+gcloud compute instances create lab-1 --zone us-east1-b --machine-type=e2-standard-2
+cat ~/.config/gcloud/configurations/config_default
+
+
+User 2 :new IAM config
+--------------------------------------------------------
+   13  gcloud init --no-launch-browser
+   14  gcloud compute instances list
+   15  gcloud compute instances create lab-2 --zone europe-west4-b --machine-type=e2-standard-2
+   
+   [student-04-8d5e0ed7e561@centos-clean ~]$ gcloud compute instances create lab-2 --zone europe-west4-b --machine-type=e2-standard-2
+ERROR: (gcloud.compute.instances.create) Could not fetch resource:
+ - Required 'compute.instances.create' permission for 'projects/qwiklabs-gcp-04-ce63962536c7/zones/europe-west4-b/instances/lab-2'
+ 
+ 
+ Setting IAM permissions
+ -------------------------------
+   17  gcloud config configurations activate default
+   18  gcloud iam roles list | grep "name:"
+   19  gcloud iam roles describe roles/compute.instanceAdmin
+   20  gcloud config configurations activate user2
+   21  echo "export PROJECTID2=qwiklabs-gcp-00-68cbf58101c6" >> ~/.bashrc
+   23  gcloud config set project $PROJECTID2
+   24  gcloud config configurations activate default
+   25  sudo yum -y install epel-release
+   26  sudo yum -y install jq
+   27  echo "export USERID2=student-04-68be81c47ccb@qwiklabs.net" >> ~/.bashrc
+   29  gcloud projects add-iam-policy-binding $PROJECTID2 --member user:$USERID2 --role=roles/viewer
+   30  gcloud config configurations activate user2
+   31  gcloud config set project $PROJECTID2
+   32  gcloud compute instances list
+   33  gcloud compute instances create lab-2 --zone europe-west4-b --machine-type=e2-standard-2
+   
+   
+    adding permissions
+   -------------------------------------------------------------------------------
+   34  gcloud config configurations activate default
+   35  gcloud iam roles create devops --project $PROJECTID2 --permissions "compute.instances.create,compute.instances.delete,compute.instances.start,compute.instances.stop,compute.instances.update,compute.disks.create,compute.subnetworks.use,compute.subnetworks.useExternalIp,compute.instances.setMetadata,compute.instances.setServiceAccount"
+   36  gcloud projects add-iam-policy-binding $PROJECTID2 --member user:$USERID2 --role=roles/iam.serviceAccountUser
+   37  gcloud projects add-iam-policy-binding $PROJECTID2 --member user:$USERID2 --role=projects/$PROJECTID2/roles/devops
+   38  gcloud config configurations activate user2
+   39  gcloud compute instances create lab-2 --zone europe-west4-b --machine-type=e2-standard-2
+   40  gcloud compute instances list
+   
+   service account
+   ------------------------------------------------------
+   gcloud config configurations activate default
+   gcloud config set project $PROJECTID2
+   gcloud iam service-accounts create devops --display-name devops
+   gcloud iam service-accounts list  --filter "displayName=devops"
+   SA=$(gcloud iam service-accounts list --format="value(email)" --filter "displayName=devops")
+   gcloud projects add-iam-policy-binding $PROJECTID2 --member serviceAccount:$SA --role=roles/iam.serviceAccountUser
+   
+   gcloud projects add-iam-policy-binding $PROJECTID2 --member serviceAccount:$SA --role=roles/compute.instanceAdmin
+   gcloud compute instances create lab-3 --zone europe-west4-b --machine-type=e2-standard-2 --service-account $SA --scopes "https://www.googleapis.com/auth/compute"
+   
+   student-04-8d5e0ed7e561@lab-3:~$ history
+    1  gcloud config list
+    2  gcloud compute instances create lab-4 --zone europe-west4-b --machine-type=e2-standard-2
+    3  gcloud compute instances list
+    4  history
+	
