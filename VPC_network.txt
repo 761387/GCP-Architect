@@ -1,0 +1,70 @@
+gcloud config set compute/zone "us-west1-c"
+export ZONE=$(gcloud config get compute/zone)
+
+gcloud config set compute/region "us-west1"
+export REGION=$(gcloud config get compute/region)
+
+--VPC Networks
+----------------------
+gcloud compute networks create taw-custom-network --subnet-mode=custom
+
+VPC Subnets
+------------------
+gcloud compute networks subnets create subnet-us-west1 --network=taw-custom-network --region=us-west1 --range=10.0.0.0/16
+gcloud compute networks subnets create subnet-europe-west1 --network=taw-custom-network --region=europe-west1 --range=10.1.0.0/16
+gcloud compute networks subnets create subnet-europe-west4 --network=taw-custom-network --region=europe-west4 --range=10.2.0.0/16
+
+VPC Firewall
+---------------------------
+gcloud compute firewall-rules create nw101-allow-http --allow tcp:80 --network taw-custom-network --source-ranges 0.0.0.0/0 --target-tags http
+gcloud compute firewall-rules create "nw101-allow-icmp" --allow icmp --network "taw-custom-network" --target-tags rules
+gcloud compute firewall-rules create "nw101-allow-internal" --allow tcp:0-65535,udp:0-65535,icmp --network "taw-custom-network" --source-ranges "10.0.0.0/16","10.2.0.0/16","10.1.0.0/16"
+gcloud compute firewall-rules create "nw101-allow-ssh" --allow tcp:22 --network "taw-custom-network" --target-tags "ssh"
+gcloud compute firewall-rules create "nw101-allow-rdp" --allow tcp:3389 --network "taw-custom-network"
+
+VM instances
+------------------------------
+gcloud compute instances create us-test-01 --subnet subnet-us-west1 --zone us-west1-c --machine-type e2-standard-2 --tags ssh,http,rules
+Created [https://www.googleapis.com/compute/v1/projects/qwiklabs-gcp-03-f16504147f81/zones/us-west1-c/instances/us-test-01].
+NAME: us-test-01
+ZONE: us-west1-c
+MACHINE_TYPE: e2-standard-2
+PREEMPTIBLE: 
+INTERNAL_IP: 10.0.0.2
+EXTERNAL_IP: 34.83.40.70
+STATUS: RUNNING
+
+gcloud compute instances create us-test-02 --subnet subnet-europe-west1 --zone europe-west1-c --machine-type e2-standard-2 --tags ssh,http,rules
+Created [https://www.googleapis.com/compute/v1/projects/qwiklabs-gcp-03-f16504147f81/zones/europe-west1-c/instances/us-test-02].
+NAME: us-test-02
+ZONE: europe-west1-c
+MACHINE_TYPE: e2-standard-2
+PREEMPTIBLE: 
+INTERNAL_IP: 10.1.0.2
+EXTERNAL_IP: 34.76.112.118
+STATUS: RUNNING
+
+gcloud compute instances create us-test-03 --subnet subnet-europe-west4 --zone europe-west4-a --machine-type e2-standard-2 --tags ssh,http,rules
+Created [https://www.googleapis.com/compute/v1/projects/qwiklabs-gcp-03-f16504147f81/zones/europe-west4-a/instances/us-test-03].
+NAME: us-test-03
+ZONE: europe-west4-a
+MACHINE_TYPE: e2-standard-2
+PREEMPTIBLE: 
+INTERNAL_IP: 10.2.0.2
+EXTERNAL_IP: 35.204.15.110
+STATUS: RUNNING
+
+Check VMs using SSH
+---------------------
+ping -c 3 <us-test-02-external-ip-address>
+ping -c 3 34.76.112.118
+ping -c 3 <us-test-03-external-ip-address>
+ping -c 3 35.204.15.110
+ping -c 3 <us-test-01-external-ip-address>
+ping -c 3 34.83.40.70
+
+check latency
+-----------
+ping -c 3 us-test-02.europe-west1-c
+
+

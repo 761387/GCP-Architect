@@ -1,0 +1,61 @@
+ 1  gcloud auth list
+    2  gcloud set project qwiklabs-gcp-02-99459b8d0fd9
+    3  gcloud config set project qwiklabs-gcp-02-99459b8d0fd9
+    4  gcloud config list project
+    5  gcloud pubsub subscriptions pull --auto-ack MySub
+	
+--Gsutil
+------------------
+student_03_0969647efbad@cloudshell:~ (qwiklabs-gcp-01-a0ba493527a1)$ history
+    1  gcloud pubsub topics create MyTopic
+    2  gcloud pubsub topics create Test1
+    3  gcloud pubsub topics create Test2
+    4  gcloud pubsub topics list
+    5  gcloud pubsub topics delete Test2
+    6  gcloud pubsub topics delete Test1
+    7  gcloud pubsub topics list
+    8  gcloud pubsub subscriptios create --topic MyTopic MySubscription
+    9  gcloud pubsub subscriptions create --topic MyTopic MySubscription
+   10  gcloud pubsub subscriptions create --topic MyTopic Test1
+   11  gcloud pubsub subscriptions create --topic MyTopic Test2
+   12  gcloud pubsub topics list-subscriptions myTopic
+   13  gcloud pubsub topics list-subscriptions MyTopic
+   14  gcloud pubsub subscriptions delete Test1
+   15  gcloud pubsub subscriptions delete Test2
+   16  gcloud pubsub topics list-subscriptions MyTopic
+   17  gcloud pubsub topics publish MyTopic --message Hello
+   18  gcloud pubsub topics publish MyTopic --message 'Publisher's name is Vikram Adla'
+   19  gcloud pubsub topics publish MyTopic --message "Publisher's name is Vikram Adla"
+   20  gcloud pubsub topics publish MyTopic --message "Publisher's like to eat Biryani"
+   21  gcloud pubsub topics publish MyTopic --message "Publisher think pub/sub is awesome"
+   22  gcloud pubsub subscriptions pull MySubscription --auto-ack
+   23  gcloud pubsub topics publish MyTopic --message "Publisher think pub/sub is awesome1"
+   24  gcloud pubsub topics publish MyTopic --message "Publisher think pub/sub is awesome2"
+   25  gcloud pubsub topics publish MyTopic --message "Publisher think pub/sub is awesome3"
+   26  gcloud pubsub subscriptions pull MySubscription --auto-ack --limit=3
+   
+   Python
+   -------------
+     1  gcloud auth list
+    2  gcloud config set project qwiklabs-gcp-03-d05ba1a81e22
+    3  sudo apt-get install -y virtaulenv
+    4  sudo apt-get install -y virtualenv
+    5  python3 -m venv venv
+    6  source venv/bin/activate
+    7  pip install --upgrade google-cloud-pubsub
+    8  git clone https://github.com/googleapis/python-pubsub.git
+    9  cd python-pubsub/samples/snippets
+   10  echo $GOOGLE_CLOUD_PROJECT
+   11  cat publisher.py
+   12  python publisher.py -h
+   13  python publisher.py $GOOGLE_CLOUD_PROJECT create MyTopic
+   14  python publisher.py $GOOGLE_CLOUD_PROJECT list
+   15  python subscriber.py $GOOGLE_CLOUD_PROJECT create MyTopic MySub
+   16  python subscriber.py $GOOGLE_CLOUD_PROJECT list-in-project
+   17  python subscriber.py -h
+   18  gcloud pubsub topics publish MyTopic --message "Hello"
+   19  gcloud pubsub topics publish MyTopic --message "Publisher's name is vikram"
+   20  gcloud pubsub topics publish MyTopic --message "Publisher likes to eat biryani"
+   21  gcloud pubsub topics publish MyTopic --message "Publisher thinks Pub/Sub is awesome"
+   22  python subscriber.py $GOOGLE_CLOUD_PROJECT receive MySub
+   23  history
